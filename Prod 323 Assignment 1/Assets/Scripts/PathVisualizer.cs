@@ -13,6 +13,10 @@ public class PathVisualizer : MonoBehaviour
     private  TerrainGraph graph;
     private float offset = 0.5f;
 
+    public List<Node> path = null;
+
+
+
     private void Start()
     {
         graph = new TerrainGraph();
@@ -20,8 +24,8 @@ public class PathVisualizer : MonoBehaviour
     }
 
     private void Update() {
-        if(startGO.transform.hasChanged || goalGO.transform.hasChanged)
-            Visualised();
+        //if(startGO.transform.hasChanged || goalGO.transform.hasChanged)
+           // Visualised();
     }
 
     private void Visualised() {
@@ -31,7 +35,7 @@ public class PathVisualizer : MonoBehaviour
         int x2 = (int) goalGO.transform.position.x;
         int y2 = (int) goalGO.transform.position.z;
 
-        List<Node> path = null;
+        //List<Node> path = null;
         
         switch(algorithm)
         {
@@ -54,7 +58,7 @@ public class PathVisualizer : MonoBehaviour
 
         Vector3[] lv = new Vector3[path.Count];
         int i = 0;
-        //Debug.Log(path.Count);
+        Debug.Log(path.Count);
         foreach (Node n in path)
         {
             lv[i++] = new Vector3(n.Position.x + offset, n.height + offset, n.Position.y + offset);
