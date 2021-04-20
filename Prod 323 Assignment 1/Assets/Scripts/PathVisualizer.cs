@@ -13,7 +13,7 @@ public class PathVisualizer : MonoBehaviour
     private  TerrainGraph graph;
     private float offset = 0.5f;
 
-    public List<Node> path = null;
+    public List<Node> route = null;
 
 
 
@@ -35,7 +35,7 @@ public class PathVisualizer : MonoBehaviour
         int x2 = (int) goalGO.transform.position.x;
         int y2 = (int) goalGO.transform.position.z;
 
-        //List<Node> path = null;
+        List<Node> path = null;
         
         switch(algorithm)
         {
@@ -55,6 +55,8 @@ public class PathVisualizer : MonoBehaviour
                     path = TerrainPathfinding.Search(graph, graph.t_grid[x1, y1], graph.t_grid[x2, y2], (int) Algorithm.AstarEuclid3D);
                     break;        
         }
+
+        route = path;
 
         Vector3[] lv = new Vector3[path.Count];
         int i = 0;
