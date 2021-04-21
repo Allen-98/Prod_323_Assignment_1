@@ -116,10 +116,20 @@ public class AIAgent : MonoBehaviour
         if (changeDirection)
         {
             Debug.Log("nnnnnnnnnnnnnnnnnnnnnnnn");
-            //rb.AddForce(direction * -2, ForceMode.Impulse);
+            //rb.AddForce(direction * -5, ForceMode.Impulse);
             rb.Sleep();
             changeDirection = false;
-            node += 1;
+            
+            if (node < route.Count)
+            {
+                node += 1;
+            }
+
+            if (futureNode < route.Count)
+            {
+                futureNode = node + 1;
+            }
+
 
         }
 
@@ -128,13 +138,19 @@ public class AIAgent : MonoBehaviour
         if (distance < 2)
         {
             startPos = route[node].Position;
-            node += 1;
+            if (node < route.Count)
+            {
+                node += 1;
+            }
         }
        
         if (futureDirection == direction)
         {
-            futureNode = node + 1;
-            
+            if (futureNode < route.Count)
+            {
+                futureNode = node + 1;
+            }
+
         }
         
         if (futureNode == node)
