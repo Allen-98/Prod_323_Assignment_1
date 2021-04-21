@@ -134,32 +134,15 @@ GameObject:
   - component: {fileID: 28365395}
   - component: {fileID: 28365394}
   - component: {fileID: 28365393}
-  - component: {fileID: 28365399}
-  - component: {fileID: 28365392}
   - component: {fileID: 28365398}
   - component: {fileID: 28365400}
   m_Layer: 0
-  m_Name: Player
+  m_Name: Agent
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &28365392
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 28365391}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0ce308a812d7b7b4ca20758d66193802, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  force: 3
-  start: {fileID: 1837522216}
-  maxForce: 10
 --- !u!54 &28365393
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -245,7 +228,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 28365391}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 108.13, y: 1.72, z: 80.8}
+  m_LocalPosition: {x: 113.99, y: 1.72, z: 69.64}
   m_LocalScale: {x: 1.5, y: 1.5, z: 1.5}
   m_Children: []
   m_Father: {fileID: 0}
@@ -348,22 +331,6 @@ LineRenderer:
     generateLightingData: 0
   m_UseWorldSpace: 1
   m_Loop: 0
---- !u!114 &28365399
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 28365391}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 836e47c6de4e0ac4796bbf038827490c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  algorithm: 0
-  startGO: {fileID: 1837522212}
-  goalGO: {fileID: 1064514973}
-  pathRenderer: {fileID: 28365398}
 --- !u!114 &28365400
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -377,12 +344,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   algorithm: 0
-  startGO: {fileID: 1837522212}
+  startGO: {fileID: 28365391}
   goalGO: {fileID: 1064514973}
   pathRenderer: {fileID: 28365398}
-  force: 3
-  start: {fileID: 1837522216}
-  maxForce: 8
+  force: 70
+  start: {fileID: 28365397}
+  maxForce: 50
 --- !u!1 &488779181
 GameObject:
   m_ObjectHideFlags: 0
@@ -890,7 +857,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!65 &1837522213
 BoxCollider:
   m_ObjectHideFlags: 0

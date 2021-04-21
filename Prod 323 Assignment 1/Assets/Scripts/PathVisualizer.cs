@@ -25,7 +25,7 @@ public class PathVisualizer : MonoBehaviour
 
     private void Update() {
         //if(startGO.transform.hasChanged || goalGO.transform.hasChanged)
-           // Visualised();
+          //  Visualised();
     }
 
     private void Visualised() {

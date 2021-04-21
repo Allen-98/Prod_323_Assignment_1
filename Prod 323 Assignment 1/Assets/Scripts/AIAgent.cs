@@ -24,6 +24,11 @@ public class AIAgent : MonoBehaviour
     private Vector3 lastDirection;
     private Vector3 currentDirection;
     private float currentForce=0;
+    private int node = 0;
+    private Vector2 startPos;
+    private Vector3 futureDirection;
+    private int futureNode = 0;
+    private bool changeDirection = false;
 
     private void Start()
     {
@@ -34,11 +39,16 @@ public class AIAgent : MonoBehaviour
         //this.transform.position = new Vector3(start.transform.position.x, 2, start.transform.position.z);
         lastDirection = new Vector3(0, 0, 0);
         currentDirection = new Vector3(0, 0, 0);
+
+        startPos = new Vector2(this.transform.position.x, this.transform.position.z);
+        futureDirection = new Vector3(route[node].Position.x - startPos.x, 0, route[node].Position.y - startPos.y);
+        currentPos = new Vector2(this.transform.position.x, this.transform.position.z);
     }
 
     private void Update()
     {
         currentPos = new Vector2(this.transform.position.x, this.transform.position.z);
+        //Debug.Log(currentPos);
         //if(startGO.transform.hasChanged || goalGO.transform.hasChanged)
         // Visualised();
     }
@@ -88,54 +98,55 @@ public class AIAgent : MonoBehaviour
 
     private void FixedUpdate()
     {
-        Vector3 direction = new Vector3(route[0].Position.x - this.transform.position.x, 0, route[0].Position.y - this.transform.position.z);
+
+        if (node > 0)
+        {
+            futureDirection = new Vector3(route[node+1].Position.x - route[node].Position.x, 0, route[node+1].Position.y - route[node].Position.y);
+        }
+
+        Vector3 direction = new Vector3(route[node].Position.x - startPos.x, 0, route[node].Position.y - startPos.y);
+
+   
+        float distance = Mathf.Sqrt(Mathf.Pow((route[node].Position.x - currentPos.x), 2) + Mathf.Pow((route[node].Position.y - currentPos.y), 2));
         
-        if(currentForce < maxForce)
-        {
-            rb.AddForce(direction * force, ForceMode.Force);
-        }
+        rb.AddForce(direction * force, ForceMode.Force);
+        Debug.Log(direction);
+        Debug.Log(futureDirection);
 
-
-        if(currentPos == route[0].Position)
+        if (changeDirection)
         {
+            Debug.Log("nnnnnnnnnnnnnnnnnnnnnnnn");
+            //rb.AddForce(direction * -2, ForceMode.Impulse);
             rb.Sleep();
+            changeDirection = false;
+            node += 1;
 
         }
 
 
 
-
-        //rb.AddForce(direction * force, ForceMode.Force);
-        //currentPos = new Vector2(this.transform.position.x, this.transform.position.z);
-
-        /*
-        for (int i = 0; i < (route.Count - 1); i++)
+        if (distance < 2)
         {
-
-            Vector3 direction = new Vector3(route[i].Position.x - this.transform.position.x, 0, route[i].Position.y - this.transform.position.z);
-            currentDirection = direction;
-
-            do
-            {
-                if (currentDirection == lastDirection)
-                {
-                    continue;
-
-                }
-                rb.AddForce(currentDirection * force, ForceMode.Force);
-                lastDirection = currentDirection;
-
-            } while (currentPos != route[i].Position);
-
-            rb.AddForce(currentDirection * -force * 2, ForceMode.Impulse);
-
+            startPos = route[node].Position;
+            node += 1;
         }
-        */
+       
+        if (futureDirection == direction)
+        {
+            futureNode = node + 1;
+            
+        }
+        
+        if (futureNode == node)
+        {
+            changeDirection = true;
+        }
+
+        
+        
+
 
     }
-
-
-
 
 
 
