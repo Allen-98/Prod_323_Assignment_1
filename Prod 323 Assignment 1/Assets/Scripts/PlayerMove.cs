@@ -12,64 +12,107 @@ public class PlayerMove : MonoBehaviour
 
     private Vector2 currentPos;
     private PathVisualizer pathVis;
-    private List<Node> racePath;
+    private List<Node> route;
 
 
-    private Vector3 lastDirection;
-    private Vector3 currentDirection;
 
+    int node;
+    int nextNode;
+    Vector3 moveDirection;
+    Vector3 nextDirection;
+    float nodeDistance = 0;
+    bool atGoal=false;
 
     // Start is called before the first frame update
     void Start()
     {
         pathVis = GetComponent<PathVisualizer>();
-        racePath = pathVis.route;
+        route = pathVis.route;
         rb = GetComponent<Rigidbody>();
-        //this.transform.position = new Vector3(start.transform.position.x, 2, start.transform.position.z);
-        lastDirection = new Vector3(0, 0, 0);
-        currentDirection = new Vector3(0, 0, 0);
-        Debug.Log(pathVis.route.Count);
+
+        node = 0;
+        nextNode = node + 1;
+        currentPos = new Vector2(this.transform.position.x, this.transform.position.z);
+
+
+        moveDirection = new Vector3(route[node].Position.x - this.transform.position.x, 0, route[node].Position.y - this.transform.position.y);
+        nextDirection = new Vector3(route[nextNode].Position.x - route[node].Position.x, 0, route[nextNode].Position.y - route[node].Position.y);
+        nodeDistance = Mathf.Sqrt(Mathf.Pow((route[node].Position.x - currentPos.x), 2) + Mathf.Pow((route[node].Position.y - currentPos.y), 2));
+
+
+
     }
 
     // Update is called once per frame
     void Update()
     {
         currentPos = new Vector2(this.transform.position.x, this.transform.position.z);
-        
-        //rb.AddForce(direction * force, ForceMode.Force);
+        //nodeDistance = Mathf.Sqrt(Mathf.Pow((route[node].Position.x - currentPos.x), 2) + Mathf.Pow((route[node].Position.y - currentPos.y), 2));
+
 
     }
 
 
+
     private void FixedUpdate()
     {
-        //rb.AddForce(direction * force, ForceMode.Force);
-        //currentPos = new Vector2(this.transform.position.x, this.transform.position.z);
-        
-        for (int i = 0; i < (racePath.Count - 1); i++)
+
+        nodeDistance = Mathf.Sqrt(Mathf.Pow((route[node].Position.x - currentPos.x), 2) + Mathf.Pow((route[node].Position.y - currentPos.y), 2));
+
+        if (!atGoal)
+        {
+            rb.AddForce(moveDirection * force, ForceMode.Force);
+        }
+
+        if (nextDirection != moveDirection)
         {
 
-            Vector3 direction = new Vector3(racePath[i].Position.x - this.transform.position.x, 0, racePath[i].Position.y - this.transform.position.z);
-            currentDirection = direction;
-
-            do
+            if (nodeDistance < 2)
             {
-                if (currentDirection == lastDirection)
+                rb.Sleep();
+
+                moveDirection = nextDirection;
+
+                if (nextNode < route.Count - 1)
                 {
-                    continue;
-
+                    node += 1;
+                    nextNode += 1;
                 }
-                rb.AddForce(currentDirection * force, ForceMode.Force);
-                lastDirection = currentDirection;
-
-            } while (currentPos != racePath[i].Position);
-
-            rb.AddForce(currentDirection * -force * 2, ForceMode.Impulse);
-
-
+            }
 
         }
-      
+        else
+        {
+            if(nextNode < route.Count - 1)
+            {
+                node += 1;
+                nextNode += 1;
+
+            }
+
+        }
+
+
+        if (nextNode < route.Count - 1 && node > 0)
+        {
+            nextDirection = new Vector3(route[nextNode].Position.x - route[node].Position.x, 0, route[nextNode].Position.y - route[node].Position.y);
+        }
+
+
+
+
+
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("goal"))
+        {
+            Debug.Log("Arrive the goal");
+            rb.Sleep();
+            atGoal = true;
+
+        }
     }
 
 }
