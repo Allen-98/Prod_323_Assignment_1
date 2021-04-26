@@ -22,13 +22,12 @@ public class AIAgent : MonoBehaviour
 
     private Vector2 currentPos;
 
-    private int node = 0;
-    private Vector2 startPos;
-    private Vector3 futureDirection;
-    private int futureNode = 0;
-    private bool changeDirection = false;
-    private bool atGoal = false;
-
+    int node;
+    int nextNode;
+    Vector3 moveDirection;
+    Vector3 nextDirection;
+    float nodeDistance = 0;
+    bool atGoal = false;
 
     private void Start()
     {
@@ -37,10 +36,16 @@ public class AIAgent : MonoBehaviour
 
         rb = GetComponent<Rigidbody>();
         //this.transform.position = new Vector3(start.transform.position.x, 2, start.transform.position.z);
-
-        startPos = new Vector2(this.transform.position.x, this.transform.position.z);
-        futureDirection = new Vector3(route[node].Position.x - startPos.x, 0, route[node].Position.y - startPos.y);
+       
+        node = 0;
+        nextNode = node + 1;
         currentPos = new Vector2(this.transform.position.x, this.transform.position.z);
+
+        moveDirection = new Vector3(route[node].Position.x - this.transform.position.x, 0, route[node].Position.y - this.transform.position.y);
+        nextDirection = new Vector3(route[nextNode].Position.x - route[node].Position.x, 0, route[nextNode].Position.y - route[node].Position.y);
+        nodeDistance = Mathf.Sqrt(Mathf.Pow((route[node].Position.x - currentPos.x), 2) + Mathf.Pow((route[node].Position.y - currentPos.y), 2));
+
+
     }
 
     private void Update()
@@ -95,61 +100,52 @@ public class AIAgent : MonoBehaviour
     private void FixedUpdate()
     {
 
-        Vector3 direction = new Vector3(route[node].Position.x - startPos.x, 0, route[node].Position.y - startPos.y);
-        
-        float distance = Mathf.Sqrt(Mathf.Pow((route[node].Position.x - currentPos.x), 2) + Mathf.Pow((route[node].Position.y - currentPos.y), 2));
+        nodeDistance = Mathf.Sqrt(Mathf.Pow((route[node].Position.x - currentPos.x), 2) + Mathf.Pow((route[node].Position.y - currentPos.y), 2));
 
-        rb.AddForce(direction * force, ForceMode.Force);
-
-        if (node > 0 && node < route.Count - 1 && atGoal == false)
+        if (!atGoal)
         {
-            futureDirection = new Vector3(route[node+1].Position.x - route[node].Position.x, 0, route[node+1].Position.y - route[node].Position.y);
+            rb.AddForce(moveDirection * force, ForceMode.Force);
         }
 
-        if (changeDirection)
+        if (nextDirection != moveDirection)
         {
-            rb.Sleep();
-            changeDirection = false;
-            
-            if (node < route.Count - 1)
+
+            if (nodeDistance < 2)
+            {
+                rb.Sleep();
+
+                moveDirection = nextDirection;
+
+                if (nextNode < route.Count - 1)
+                {
+                    node += 1;
+                    nextNode += 1;
+                }
+            }
+
+        }
+        else
+        {
+            if (nextNode < route.Count - 1)
             {
                 node += 1;
-            }
+                nextNode += 1;
 
-            if (futureNode < route.Count - 1)
-            {
-                futureNode = node + 1;
             }
-
 
         }
 
-        if (distance < 2)
+
+        if (nextNode < route.Count - 1 && node > 0)
         {
-            startPos = route[node].Position;
-            
-            if (node < route.Count - 1)
-            {
-                node += 1;
-            }
+            nextDirection = new Vector3(route[nextNode].Position.x - route[node].Position.x, 0, route[nextNode].Position.y - route[node].Position.y);
         }
-       
-        if (futureDirection == direction)
-        {
-            if (futureNode < route.Count - 1)
-            {
-                futureNode = node + 1;
-            }
 
-        }
-        
-        if (futureNode == node)
-        {
-            changeDirection = true;
-        }
+
+
+
 
     }
-
 
     private void OnTriggerEnter(Collider other)
     {

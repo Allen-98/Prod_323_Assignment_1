@@ -47,8 +47,7 @@ public class PlayerMove : MonoBehaviour
     void Update()
     {
         currentPos = new Vector2(this.transform.position.x, this.transform.position.z);
-        //nodeDistance = Mathf.Sqrt(Mathf.Pow((route[node].Position.x - currentPos.x), 2) + Mathf.Pow((route[node].Position.y - currentPos.y), 2));
-
+       
 
     }
 
