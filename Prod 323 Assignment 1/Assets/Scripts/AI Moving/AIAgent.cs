@@ -18,6 +18,7 @@ public class AIAgent : MonoBehaviour
     Rigidbody rb;
     [SerializeField] float force = 5;
     [SerializeField] float maxForce;
+    [SerializeField] float rotationSpeed = 5;
 
     private Vector2 currentPos;
 
@@ -27,7 +28,12 @@ public class AIAgent : MonoBehaviour
     Vector3 nextDirection;
     float nodeDistance = 0;
     bool atGoal = false;
-    //Animator ani;
+    RaycastHit hit;
+    GameObject obstacle;
+    bool haveObstacle = false;
+    
+    
+    Animator ani;
 
     private void Start()
     {
@@ -36,7 +42,7 @@ public class AIAgent : MonoBehaviour
 
         //rb = GetComponentInChildren<Rigidbody>();
         rb = GetComponent<Rigidbody>();
-        //ani = GetComponent<Animator>();
+        ani = GetComponent<Animator>();
         //this.transform.position = new Vector3(start.transform.position.x, 2, start.transform.position.z);
        
 
@@ -104,50 +110,16 @@ public class AIAgent : MonoBehaviour
     private void FixedUpdate()
     {
 
-        nodeDistance = Mathf.Sqrt(Mathf.Pow((route[node].Position.x - currentPos.x), 2) + Mathf.Pow((route[node].Position.y - currentPos.y), 2));
-
-        if (!atGoal)
+        
+        Obstacles();
+        if (haveObstacle)
         {
-            rb.AddForce(moveDirection * force, ForceMode.Force);
-            //ani.SetBool("isWalking", true);
-        }
-
-        if (nextDirection != moveDirection)
-        {
-
-            if (nodeDistance < 2)
-            {
-                rb.Sleep();
-                //ani.SetBool("isWalking", false);
-                moveDirection = nextDirection;
-
-                if (nextNode < route.Count - 1)
-                {
-                    node += 1;
-                    nextNode += 1;
-                }
-            }
-
+            SpecialMoving();
         }
         else
         {
-            if (nextNode < route.Count - 1)
-            {
-                node += 1;
-                nextNode += 1;
-
-            }
-
+            NormalMoving();
         }
-
-
-        if (nextNode < route.Count - 1 && node > 0)
-        {
-            nextDirection = new Vector3(route[nextNode].Position.x - route[node].Position.x, 0, route[nextNode].Position.y - route[node].Position.y);
-        }
-
-
-
 
 
     }
@@ -158,11 +130,110 @@ public class AIAgent : MonoBehaviour
         {
             Debug.Log("Arrive the goal");
             rb.Sleep();
-            //ani.SetBool("isWalking", false);
+            ani.SetBool("isWalking", false);
             atGoal = true;
 
         }
     }
 
+
+    void Rotating()
+    {
+        Vector3 targetDirection = moveDirection;
+        Quaternion targetRotation = Quaternion.LookRotation(targetDirection, Vector3.up);
+        Quaternion newRotation = Quaternion.Lerp(rb.rotation, targetRotation, rotationSpeed * Time.deltaTime);
+        rb.MoveRotation(newRotation);
+
+        
+    }
+
+    void NormalMoving()
+    {
+        nodeDistance = Vector3.Distance(route[node].Position, currentPos);
+
+        if (!atGoal)
+        {
+            Rotating();
+            rb.AddForce(moveDirection * force, ForceMode.Force);
+            ani.SetBool("isWalking", true);
+        }
+
+        if (nextDirection != moveDirection && nodeDistance < 2)
+        {
+            rb.Sleep();
+            ani.SetBool("isWalking", false);
+            moveDirection = nextDirection;
+
+
+            if (nextNode < route.Count - 1)
+            {
+                node += 1;
+                nextNode += 1;
+            }
+
+        }
+        else if (nextDirection == moveDirection)
+        {
+
+            if (nextNode < route.Count - 1)
+            {
+                node += 1;
+                nextNode += 1;
+            }
+        }
+
+        if (nextNode < route.Count - 1 && node > 0)
+        {
+            nextDirection = new Vector3(route[nextNode].Position.x - route[node].Position.x, 0, route[nextNode].Position.y - route[node].Position.y);
+        }
+
+    }
+
+    void Obstacles()
+    {
+        if (Physics.Raycast(transform.position, moveDirection, out hit, 5) && hit.collider.gameObject.CompareTag("obstacle"))
+        {
+            
+            obstacle = hit.collider.gameObject;
+
+            Vector3 hitNormal = hit.normal;
+            hitNormal.y = 0.0f;
+            float disToAvoid = hit.distance;
+
+            if (disToAvoid > 3)
+            {
+
+                if (rb.velocity.sqrMagnitude > 50)
+                {
+
+                    rb.AddForce(hitNormal * 50, ForceMode.Impulse);
+                }
+            }
+            else
+            {
+                rb.Sleep();
+                moveDirection += hitNormal;
+                haveObstacle = true;
+
+            }
+        }
+
+    }
+
+    void SpecialMoving()
+    {
+        Rotating();
+        rb.AddForce(moveDirection * force, ForceMode.Force);
+
+        float distance = Vector3.Distance(this.transform.position, obstacle.transform.position);
+
+        if (distance > 5)
+        {
+            rb.Sleep();
+
+
+
+        }
+    }
 
 }
