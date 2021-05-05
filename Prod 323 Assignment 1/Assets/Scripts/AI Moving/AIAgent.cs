@@ -200,7 +200,7 @@ public class AIAgent : MonoBehaviour
             hitNormal.y = 0.0f;
             float disToAvoid = hit.distance;
 
-            if (disToAvoid > 3)
+            if (disToAvoid > 2)
             {
 
                 if (rb.velocity.sqrMagnitude > 50)
@@ -213,7 +213,7 @@ public class AIAgent : MonoBehaviour
             {
                 rb.Sleep();
                 moveDirection += hitNormal;
-                haveObstacle = true;
+                //haveObstacle = true;
 
             }
         }
@@ -222,18 +222,27 @@ public class AIAgent : MonoBehaviour
 
     void SpecialMoving()
     {
-        Rotating();
-        rb.AddForce(moveDirection * force, ForceMode.Force);
+        //Rotating();
+        //rb.Sleep();
+        ani.SetBool("isWalking", false);
+        //rb.AddForce(moveDirection * force, ForceMode.Force);
 
         float distance = Vector3.Distance(this.transform.position, obstacle.transform.position);
 
-        if (distance > 5)
+        if (distance < 4)
         {
-            rb.Sleep();
-
+            rb.WakeUp();
+            Rotating();
+            rb.AddForce(moveDirection * force, ForceMode.Force);
+            ani.SetBool("isWalking", true);
 
 
         }
+
+
+
+
+
     }
 
 }

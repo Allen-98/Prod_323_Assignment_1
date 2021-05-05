@@ -21,6 +21,8 @@ public class PathVisualizer : MonoBehaviour
     {
         graph = new TerrainGraph();
         Visualised();
+
+        //PathImprovement();
     }
 
     private void Update() {
@@ -58,9 +60,13 @@ public class PathVisualizer : MonoBehaviour
 
         route = path;
 
+
         Vector3[] lv = new Vector3[path.Count];
         int i = 0;
         Debug.Log(path.Count);
+
+
+
         foreach (Node n in path)
         {
             lv[i++] = new Vector3(n.Position.x + offset, n.height + offset, n.Position.y + offset);
@@ -69,4 +75,48 @@ public class PathVisualizer : MonoBehaviour
         pathRenderer.SetPositions(lv);
         
     }
+
+
+    void PathImprovement()
+    {
+        RaycastHit hit;
+        int lookFrom = 0;
+        List<Node> corner = new List<Node>();
+        corner.Add(route[0]);
+
+
+        for (int node = 2; node <= route.Count - 1; node++)
+        {
+
+            Vector3 a = new Vector3(route[lookFrom].Position.x, 0, route[lookFrom].Position.y);
+            Vector3 b = new Vector3(route[node].Position.x, 0, route[node].Position.y);
+            Vector3 look = b - a;
+
+            if (Physics.Raycast(a, look, out hit, Vector3.Distance(a, b)))
+            {
+                corner.Add(route[node - 1]);
+                corner.Add(route[node]);
+                lookFrom = node - 1;
+            }
+
+
+        }
+
+        Debug.Log(corner.Count);
+
+        Vector3[] lv = new Vector3[corner.Count];
+        int i = 0;
+
+        foreach (Node n in corner)
+        {
+            lv[i++] = new Vector3(n.Position.x + offset, n.height + offset, n.Position.y + offset);
+        }
+        pathRenderer.positionCount = corner.Count;
+        pathRenderer.SetPositions(lv);
+
+
+    }
+
+
+
 }
